@@ -36,7 +36,7 @@ public class FileOrganizerService {
 
     private SaveFileResult saveFiles;
 
-    @Scheduled(initialDelayString = "3", fixedDelay = Long.MAX_VALUE, timeUnit = TimeUnit.SECONDS)
+    @Scheduled(fixedDelay = Long.MAX_VALUE, timeUnit = TimeUnit.SECONDS)
     public void initialSaveFilePathLoad() {
         if (System.getProperty("os.name").toLowerCase().contains("windows")) {
             saveFilePath = this.windowsFilePath;
@@ -59,7 +59,8 @@ public class FileOrganizerService {
 
     public ResponseEntity<Void> setSaveFilePath(String saveFilePath) {
         try {
-            Path.of(saveFilePath);
+            String path = Path.of(saveFilePath).toString();
+            LOGGER.info("Trying to save new save file path: {}", path);
             this.saveFilePath = saveFilePath;
             this.loadSaveFiles();
             return new ResponseEntity<>(HttpStatus.OK);
@@ -99,6 +100,9 @@ public class FileOrganizerService {
     public ResponseEntity<Void> saveFile(String directory, String fileName) {
         this.loadSaveFiles();
         try {
+            if (directory.isEmpty()) {
+                throw new InvalidPathException(directory, "Directory cannot be empty");
+            }
             Files.createDirectories(Paths.get(this.saveFilePath + delimiter + directory));
             Path copied = Paths.get(this.saveFilePath + "/ER0000.sl2");
             Path pasteDirectory = Path.of(this.saveFilePath + delimiter + directory + delimiter + fileName + ".sl2");
