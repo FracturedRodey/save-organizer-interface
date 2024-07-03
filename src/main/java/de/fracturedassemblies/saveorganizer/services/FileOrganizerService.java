@@ -168,6 +168,21 @@ public class FileOrganizerService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    public ResponseEntity<Void> renameFile(String directory, String oldName, String newName) {
+        this.loadSaveFiles();
+        Path oldFile = Paths.get(this.saveFilePath + delimiter + directory + delimiter + oldName + ".sl2");
+        Path newFile = Paths.get(this.saveFilePath + delimiter + directory + delimiter + newName + ".sl2");
+        try {
+            Files.copy(oldFile, newFile);
+        } catch (IOException e) {
+            LOGGER.error("Error renaming file");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        this.deleteFile(directory, oldName);
+        this.loadSaveFiles();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     private ResponseEntity<Void> invalidPathResponse(InvalidPathException e) {
         LOGGER.error("Invalid file or path. {}", e.getMessage());
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

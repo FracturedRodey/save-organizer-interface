@@ -87,12 +87,23 @@ public class SaveFileEndpoint {
 
     @CrossOrigin(origins = "http://localhost:4200")
     @Operation(summary = "Returns current save directory path.",
-            description = "To give the user some direction on which folder or path is currently used to manipulate the save files this endpoint returns the current value used..")
+            description = "To give the user some direction on which folder or path is currently used to manipulate the save files this endpoint returns the current value used.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Returns current save directory path.",
             content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)) })
     @GetMapping(value = "/int/api/1.0/savefilespath", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> savefilespath() {
         LOGGER.info("Returning save file path.");
         return this.fileOrganizerService.getSaveFilePath();
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @Operation(summary = "Renames selected save.",
+            description = "Since the user doesn't always know what the save file should be called in advance, this endpoint allows the user to rename the save file.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Renames selected save.",
+            content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)) })
+    @PutMapping(value = "/int/api/1.0/renamefile", produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<Void> renamefile(String directory, String oldName, String newName) {
+        LOGGER.info("Renaming save file.");
+        return this.fileOrganizerService.renameFile(directory, oldName, newName);
     }
 }
