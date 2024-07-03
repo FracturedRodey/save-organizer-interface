@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @EnableScheduling
 @Service
@@ -70,18 +71,16 @@ public class FileOrganizerService {
     }
 
     public void loadSaveFiles() {
-        File[] directories = new File(this.saveFilePath).listFiles(File::isDirectory);
+        List<File> directories = Arrays.asList(Objects.requireNonNull(new File(this.saveFilePath).listFiles(File::isDirectory)));
+        directories = directories.stream().filter(file -> !file.getName().contains(".git")).toList();
+
         List<SaveDirectory> saveList = new ArrayList<>();
-        if (directories != null) {
-            for (File directory : directories) {
-                SaveDirectory saveDirectory = this.getSaveDirectory(directory);
-                saveList.add(saveDirectory);
-            }
-            saveFiles = new SaveFileResult(saveList);
-            LOGGER.info("Following files were found: {}", this.saveFiles);
-        } else {
-            LOGGER.error("No directories found in {}", this.saveFilePath);
+        for (File directory : directories) {
+            SaveDirectory saveDirectory = this.getSaveDirectory(directory);
+            saveList.add(saveDirectory);
         }
+        saveFiles = new SaveFileResult(saveList);
+        LOGGER.info("Following files were found: {}", this.saveFiles);
     }
 
     private SaveDirectory getSaveDirectory(File directory) {
@@ -175,7 +174,7 @@ public class FileOrganizerService {
         try {
             Files.copy(oldFile, newFile);
         } catch (IOException e) {
-            LOGGER.error("Error renaming file");
+            LOGGER.error("Error renaming fil*~~e, {}, {}, {}", directory, oldName, newName);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         this.deleteFile(directory, oldName);

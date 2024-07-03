@@ -1,5 +1,6 @@
 package de.fracturedassemblies.saveorganizer.api;
 
+import de.fracturedassemblies.saveorganizer.data.RenameFileRequest;
 import de.fracturedassemblies.saveorganizer.data.SaveFileRequest;
 import de.fracturedassemblies.saveorganizer.data.SaveFileResult;
 import de.fracturedassemblies.saveorganizer.services.FileOrganizerService;
@@ -99,11 +100,10 @@ public class SaveFileEndpoint {
     @CrossOrigin(origins = "http://localhost:4200")
     @Operation(summary = "Renames selected save.",
             description = "Since the user doesn't always know what the save file should be called in advance, this endpoint allows the user to rename the save file.")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Renames selected save.",
-            content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)) })
-    @PutMapping(value = "/int/api/1.0/renamefile", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<Void> renamefile(String directory, String oldName, String newName) {
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Renames selected save.") })
+    @PutMapping(value = "/int/api/1.0/renamefile")
+    public ResponseEntity<Void> renamefile(@RequestBody RenameFileRequest request) {
         LOGGER.info("Renaming save file.");
-        return this.fileOrganizerService.renameFile(directory, oldName, newName);
+        return this.fileOrganizerService.renameFile(request.getDirectory(), request.getOldName(), request.getNewName());
     }
 }
